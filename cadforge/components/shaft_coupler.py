@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 import cadquery as cq
 
-from cadforge.core import Component
+from cadforge.core import Component, MatePoint
 
 
 @dataclass
@@ -112,3 +112,25 @@ class ShaftCoupler(Component):
             )
 
         return result
+
+    def mates(self) -> list[MatePoint]:
+        return [
+            MatePoint(
+                name="bore_1_entry",
+                origin=(0.0, 0.0, 0.0),
+                normal=(0.0, 0.0, -1.0),
+                mate_type="face",
+            ),
+            MatePoint(
+                name="bore_2_entry",
+                origin=(0.0, 0.0, self.length),
+                normal=(0.0, 0.0, 1.0),
+                mate_type="face",
+            ),
+            MatePoint(
+                name="center_axis",
+                origin=(0.0, 0.0, self.length / 2),
+                normal=(0.0, 0.0, 1.0),
+                mate_type="axis",
+            ),
+        ]

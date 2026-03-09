@@ -11,6 +11,27 @@ from cadquery import exporters
 
 
 @dataclass
+class MatePoint:
+    """A named connection point on a component.
+
+    Mate points describe where and how a component can connect to
+    other components in an assembly.  All coordinates are in the
+    component's local frame.
+
+    Attributes:
+        name:   Unique identifier within the component (e.g. "top_face").
+        origin: (x, y, z) position of the mate point.
+        normal: (nx, ny, nz) outward-facing direction.
+        mate_type: Semantic hint — "face", "axis", or "point".
+    """
+
+    name: str
+    origin: tuple[float, float, float]
+    normal: tuple[float, float, float]
+    mate_type: str = "face"  # "face", "axis", "point"
+
+
+@dataclass
 class Component:
     """Base class for all CAD Forge components.
 
@@ -44,6 +65,18 @@ class Component:
         if self._workplane is None:
             self._workplane = self.build()
         return self._workplane
+
+    # ------------------------------------------------------------------
+    # Mate points
+    # ------------------------------------------------------------------
+
+    def mates(self) -> list[MatePoint]:
+        """Return named mate points for assembly connections.
+
+        Subclasses should override this to expose their connection
+        geometry.  The default implementation returns an empty list.
+        """
+        return []
 
     # ------------------------------------------------------------------
     # Export helpers

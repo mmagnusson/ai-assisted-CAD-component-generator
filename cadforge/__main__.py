@@ -63,6 +63,65 @@ def cmd_list(args: argparse.Namespace) -> None:
         print(f"  {name:30s} {cls.__name__}")
 
 
+def cmd_assemble(args: argparse.Namespace) -> None:
+    """Assemble multiple components from a JSON spec."""
+    from .assembly import Assembly
+
+    if args.file:
+        spec_path = Path(args.file)
+        if not spec_path.exists():
+            print(f"Error: file not found: {spec_path}")
+            sys.exit(1)
+        spec = json.loads(spec_path.read_text())
+    elif args.spec:
+        spec = json.loads(args.spec)
+    else:
+        print("Error: provide --spec JSON or --file path")
+        sys.exit(1)
+
+    assembly = Assembly.from_spec(spec)
+
+    outdir = Path(args.output)
+    outdir.mkdir(parents=True, exist_ok=True)
+
+    assy_name = assembly.name
+    step_path = assembly.export_step(outdir / f"{assy_name}.step")
+    stl_path = assembly.export_stl(outdir / f"{assy_name}.stl")
+
+    print(f"Assembled '{assy_name}' ({len(assembly.parts)} parts):")
+    print(f"  STEP -> {step_path}")
+    print(f"  STL  -> {stl_path}")
+
+    for entry in assembly.parts_list():
+        print(f"  Part: {entry['name']} ({entry['component_type']})")
+
+    bbox = assembly.bounding_box()
+    print(f"  BBox -> {bbox[0]:.2f} x {bbox[1]:.2f} x {bbox[2]:.2f} mm")
+
+
+def cmd_schema(args: argparse.Namespace) -> None:
+    """Output the assembly JSON schema and available parts."""
+    from .planner import ASSEMBLY_SCHEMA, get_available_parts
+
+    if args.parts:
+        info = get_available_parts()
+        print(json.dumps(info, indent=2, default=str))
+    else:
+        print(json.dumps(ASSEMBLY_SCHEMA, indent=2))
+
+
+def cmd_inspect(args: argparse.Namespace) -> None:
+    """Show detailed info about a component, catalog part, or compound."""
+    from .planner import get_component_info
+
+    try:
+        info = get_component_info(args.name)
+        print(json.dumps(info, indent=2, default=str))
+    except ValueError as e:
+        print(f"Error: {e}")
+        sys.exit(1)
+
+
 def cmd_validate(args: argparse.Namespace) -> None:
     """Validate a STEP file."""
     from .validators import validate_solid
@@ -126,6 +185,51 @@ def main() -> None:
         "list", help="List available components"
     )
     list_parser.set_defaults(func=cmd_list)
+
+    # -- assemble --
+    asm_parser = subparsers.add_parser(
+        "assemble", help="Assemble components from a JSON spec"
+    )
+    asm_parser.add_argument(
+        "--spec",
+        default=None,
+        help="JSON string of assembly specification",
+    )
+    asm_parser.add_argument(
+        "--file",
+        default=None,
+        help="Path to a JSON assembly spec file",
+    )
+    asm_parser.add_argument(
+        "--output",
+        default="output",
+        help="Output directory (default: output/)",
+    )
+    asm_parser.set_defaults(func=cmd_assemble)
+
+    # -- schema --
+    schema_parser = subparsers.add_parser(
+        "schema", help="Show assembly JSON schema or available parts"
+    )
+    schema_parser.add_argument(
+        "--parts",
+        action="store_true",
+        help="List available parts instead of the schema",
+    )
+    schema_parser.set_defaults(func=cmd_schema)
+
+    # -- inspect --
+    inspect_parser = subparsers.add_parser(
+        "inspect", help="Show details for a component/catalog/compound"
+    )
+    inspect_parser.add_argument(
+        "name",
+        help=(
+            "Component name (e.g. 'l_bracket'), catalog ref "
+            "(e.g. 'catalog:hex_bolt:M6'), or compound name"
+        ),
+    )
+    inspect_parser.set_defaults(func=cmd_inspect)
 
     # -- validate --
     val_parser = subparsers.add_parser(

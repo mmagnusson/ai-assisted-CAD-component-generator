@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 import cadquery as cq
 
-from cadforge.core import Component
+from cadforge.core import Component, MatePoint
 
 
 @dataclass
@@ -80,3 +80,43 @@ class Enclosure(Component):
         )
 
         return result
+
+    def mates(self) -> list[MatePoint]:
+        return [
+            MatePoint(
+                name="bottom",
+                origin=(0.0, 0.0, 0.0),
+                normal=(0.0, 0.0, -1.0),
+                mate_type="face",
+            ),
+            MatePoint(
+                name="top",
+                origin=(0.0, 0.0, self.height),
+                normal=(0.0, 0.0, 1.0),
+                mate_type="face",
+            ),
+            MatePoint(
+                name="front",
+                origin=(0.0, -self.width / 2, self.height / 2),
+                normal=(0.0, -1.0, 0.0),
+                mate_type="face",
+            ),
+            MatePoint(
+                name="back",
+                origin=(0.0, self.width / 2, self.height / 2),
+                normal=(0.0, 1.0, 0.0),
+                mate_type="face",
+            ),
+            MatePoint(
+                name="left",
+                origin=(-self.length / 2, 0.0, self.height / 2),
+                normal=(-1.0, 0.0, 0.0),
+                mate_type="face",
+            ),
+            MatePoint(
+                name="right",
+                origin=(self.length / 2, 0.0, self.height / 2),
+                normal=(1.0, 0.0, 0.0),
+                mate_type="face",
+            ),
+        ]
