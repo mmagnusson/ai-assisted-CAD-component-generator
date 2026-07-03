@@ -1,0 +1,57 @@
+{
+  "cuff_forearm": {
+    "part": "cuff",
+    "name": "forearm",
+    "cuff_inner_radius": 48.0,
+    "cuff_outer_radius": 52.0,
+    "wrap_angle_deg": 210.0,
+    "tab_bolt_spacing": 22.0,
+    "tab_bolt_d": 4.2
+  },
+  "cuff_upperarm": {
+    "part": "cuff",
+    "name": "upperarm",
+    "cuff_inner_radius": 58.0,
+    "cuff_outer_radius": 62.0,
+    "wrap_angle_deg": 210.0,
+    "tab_bolt_spacing": 22.0,
+    "tab_bolt_d": 4.2
+  },
+  "actuator_mount": {
+    "part": "actuator_mount",
+    "name": "actuator_mount",
+    "bore_radius": 8.0,
+    "actuator_bolt_circle": {
+      "radius": 25.0,
+      "n": 6,
+      "bolt_d": 4.2,
+      "positions": [
+        [
+          25.0,
+          0.0
+        ],
+        [
+          12.5,
+          21.65
+        ],
+        [
+          -12.5,
+          21.65
+        ],
+        [
+          -25.0,
+          0.0
+        ],
+        [
+          -12.5,
+          -21.65
+        ],
+        [
+          12.5,
+          -21.65
+        ]
+      ]
+    },
+    "pad_bolt_spacing": 22.0
+  }
+}

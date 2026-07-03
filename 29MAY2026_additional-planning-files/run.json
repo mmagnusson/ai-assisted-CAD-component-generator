@@ -1,0 +1,13 @@
+{
+  "gains": {
+    "alpha": 2.0,
+    "tau_max": 40.0,
+    "duration": 6.0,
+    "grav_comp": true
+  },
+  "effort_multiplier": 3.0,
+  "static_hold_motor_torque_Nm": 31.78,
+  "peak_motor_torque_Nm": 34.23,
+  "final_angle_deg": -145.0,
+  "hit_torque_limit": false
+}

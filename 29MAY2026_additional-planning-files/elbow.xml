@@ -1,0 +1,31 @@
+<!-- Project Wayland — Elbow Module v1 : single-joint plant for gain tuning.
+     1-DOF elbow hinge. Forearm along +X at angle 0 (horizontal = worst-case gravity).
+     Hinge axis +Y. Flexion (curl) drives the forearm up toward +Z.
+     A 10 kg load sits at the hand. One torque-source actuator on the joint. -->
+<mujoco model="wayland_elbow_v1">
+  <option gravity="0 0 -9.81" timestep="0.0005" integrator="RK4"/>
+  <default>
+    <joint armature="0.01" damping="0.2"/>
+    <geom rgba="0.55 0.6 0.7 1"/>
+  </default>
+
+  <worldbody>
+    <body name="upperarm" pos="0 0 0.5">
+      <geom name="ua" type="capsule" fromto="0 0 0 0 0 0.06" size="0.035"/>
+      <body name="forearm" pos="0 0 0">
+        <!-- 0 deg = horizontal; negative = curled up. range keeps it anatomical. -->
+        <joint name="elbow" type="hinge" axis="0 1 0" pos="0 0 0" range="-145 5"/>
+        <geom name="fa" type="capsule" fromto="0 0 0 0.30 0 0" size="0.025" mass="1.6"/>
+        <site name="hand" pos="0.30 0 0" size="0.01"/>
+        <body name="load" pos="0.30 0 0">
+          <geom name="load" type="sphere" size="0.045" mass="10" rgba="0.8 0.4 0.3 1"/>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <actuator>
+    <!-- gear=1 so ctrl is commanded joint torque in N*m; clamp = firmware torque limit -->
+    <motor name="elbow_mot" joint="elbow" gear="1" ctrlrange="-40 40"/>
+  </actuator>
+</mujoco>
